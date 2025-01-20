@@ -109,8 +109,8 @@ VALUES
 -- ------------------------------------------------------------
 INSERT INTO products (product_name, description, price)
 VALUES
-  ('Product A', 'Description of Product A', 10.00),
-  ('Product B', 'Description of Product B', 20.00);
+  ('TheFunction', 'Plugin de espacialidade avançada', 0.20),
+  ('TheWave', 'Plugin da ondinha', 0.20);
 
 -- ------------------------------------------------------------
 -- 3) Inserir pagamentos (recargas) - Teste do Trigger de Payment

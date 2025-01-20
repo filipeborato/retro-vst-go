@@ -1,5 +1,3 @@
-// main.go
-
 package main
 
 import (
@@ -9,48 +7,41 @@ import (
     "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
 
-    // Ajuste o nome do import conforme o seu módulo
-    "retrovst/db"
+    "retro-vst-go/db" // Ajuste conforme seu go.mod
 )
 
-func main() {	
-    // 1. Carregamos as variáveis de ambiente do arquivo .env
-    err := godotenv.Load()
-    if err != nil {
+func main() {
+    // Carrega .env se desejar
+    if err := godotenv.Load(); err != nil {
         log.Printf("Não foi possível carregar .env: %v", err)
     }
 
-    // 2. Se quisermos ler a porta do arquivo .env também
-    port := os.Getenv("APP_PORT")
-    if port == "" {
-        port = ":8080"
-    }
-
-    // 3. Configura o banco de dados (SQLite) usando a função SetupDatabase()
+    // Inicia o banco (SQLite)
     database, err := db.SetupDatabase()
     if err != nil {
         log.Fatalf("Falha ao configurar o banco: %v\n", err)
     }
-    defer database.Close()
 
-    // 4. Inicializa o Gin
+    // Faz migração (AutoMigrate + índices + triggers)
+    if err := db.AutoMigrateDB(database); err != nil {
+        log.Fatalf("Erro na migração: %v\n", err)
+    }
+
+    // Se estiver em ambiente de teste/desenvolvimento, pode inserir mocks:
+    // env := os.Getenv("APP_ENV") // ex: "development" ou "production"
+    // if env == "development" {
+    //     if err := db.InsertMockData(database); err != nil {
+    //         log.Fatalf("Erro ao inserir dados de teste: %v\n", err)
+    //     }
+    // }
+
+    // Inicializa Gin
     r := gin.Default()
 
-    // Rota simples para teste
+    // Exemplo de rota teste
     r.GET("/ping", func(c *gin.Context) {
         c.JSON(200, gin.H{"message": "pong"})
     })
 
-    // Rota para testar a conexão com o banco
-    r.GET("/testdb", func(c *gin.Context) {
-        _, err := database.Exec("SELECT 1")
-        if err != nil {
-            c.JSON(500, gin.H{"error": err.Error()})
-            return
-        }
-        c.JSON(200, gin.H{"message": "DB connected successfully"})
-    })
-
-    // 5. Inicia o servidor na porta definida em .env
-    r.Run(port)
+    r.Run(":8080") // inicia servidor
 }

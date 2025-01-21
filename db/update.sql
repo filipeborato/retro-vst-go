@@ -1,6 +1,6 @@
--- SQLite
-UPDATE products (product_name, description, price)
-VALUES
-  ('TheFunction', 'Plugin de espacialidade avançada', 0.20),
-  
+UPDATE products
+SET
+  product_name = 'TheFunction',
+  description = 'Plugin de espacialidade avançada',
+  price = 0.20
 WHERE product_id = 1;

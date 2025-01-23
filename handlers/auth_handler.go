@@ -55,13 +55,16 @@ func SignupHandler(db *gorm.DB) gin.HandlerFunc {
             return
         }
 
-        // Se quiser retornar um JWT imediatamente, gere aqui
-        // token, err := CreateJWT(user)
-        // ...
+        //Se quiser retornar um JWT imediatamente, gere aqui
+        token, err := CreateJWT(user)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create token"})
+            return
+        }
 
         c.JSON(http.StatusOK, gin.H{
             "message": "Signup successful",
-            // "token": token,
+            "token": token,
         })
     }
 }
@@ -133,4 +136,35 @@ func CreateJWT(user domain.User) (string, error) {
 
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
     return token.SignedString(jwtSecret)
+}
+
+func AuthMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        authHeader := c.GetHeader("Authorization")
+        if authHeader == "" {
+            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
+            return
+        }
+
+        tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+
+        token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+            return jwtSecret, nil
+        })
+        if err != nil || !token.Valid {
+            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+            return
+        }
+
+        // Recupera claims
+        claims, ok := token.Claims.(*CustomClaims)
+        if !ok {
+            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid claims"})
+            return
+        }
+
+        // Salvar user_id nos context
+        c.Set("user_id", claims.UserID)
+        c.Next()
+    }
 }

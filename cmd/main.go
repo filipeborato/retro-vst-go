@@ -2,10 +2,10 @@ package main
 
 import (    
     "log" 
-
+    
     "github.com/gin-gonic/gin"
     "retro-vst-go/handlers"
-    "retro-vst-go/db"
+    "retro-vst-go/db"        
 )
 
 func main() {
@@ -28,9 +28,16 @@ func main() {
     // Exemplo de rota protegida
     // r.GET("/profile", AuthMiddleware(), ProfileHandler)
 
+    protected := r.Group("/api")
+    protected.Use(handlers.AuthMiddleware())
+    {
+        protected.GET("/profile", handlers.ProfileHandler())        
+    }
+
     r.GET("/ping", func(c *gin.Context) {
         c.JSON(200, gin.H{"message": "pong"})
     })
 
     r.Run(":8080")
 }
+

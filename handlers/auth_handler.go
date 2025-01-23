@@ -5,6 +5,7 @@ package handlers
 import (
     "net/http"
     "strings"
+    "os"
 
     "github.com/gin-gonic/gin"
     "golang.org/x/crypto/bcrypt"
@@ -118,7 +119,7 @@ func LoginHandler(db *gorm.DB) gin.HandlerFunc {
         })
     }
 }
-var jwtSecret = []byte("SUA_CHAVE_SECRETA") // Ideal ler de variável de ambiente
+var jwtSecret = []byte(os.Getenv("JWT_KEY")) // Ideal ler de variável de ambiente
 
 type CustomClaims struct {
     UserID uint `json:"user_id"`

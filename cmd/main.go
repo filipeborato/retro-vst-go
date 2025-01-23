@@ -1,42 +1,36 @@
 package main
 
-import (
-    "log"
-    "os"
-    "github.com/gin-gonic/gin"
-    "github.com/joho/godotenv"
+import (    
+    "log" 
 
+    "github.com/gin-gonic/gin"
+    "retro-vst-go/handlers"
     "retro-vst-go/db"
 )
 
 func main() {
-    // Carrega .env (opcional)
-    if err := godotenv.Load(); err != nil {
-        log.Printf("Não foi possível carregar .env: %v", err)
+    // Conexão simples com SQLite (pode usar db.SetupDatabase() se tiver pronto)
+    db, err := db.SetupDatabase()
+    if err != nil {        
+        log.Fatal(err)
     }
-
-    // Conecta ao banco, mas **não** chama AutoMigrate nem InsertMockData aqui
-    database, err := db.SetupDatabase()
-    if err != nil {
-        log.Fatalf("Falha ao configurar o banco: %v\n", err)
-    }
-
-    //Se quiser fechar a conexão ao encerrar:
-    defer func() {
-       sqlDB, _ := database.DB()
-       sqlDB.Close()
-    }()
 
     r := gin.Default()
 
-    // Rotas
+    // Rotas signup e login
+    r.POST("/signup", handlers.SignupHandler(db))
+    r.POST("/login", handlers.LoginHandler(db))
+
+    // Google OAuth
+    // - Rota de redirect: GET /auth/google => redireciona para Google
+    // - Rota de callback: GET /auth/google/callback => handlers.GoogleCallbackHandler(db)
+
+    // Exemplo de rota protegida
+    // r.GET("/profile", AuthMiddleware(), ProfileHandler)
+
     r.GET("/ping", func(c *gin.Context) {
         c.JSON(200, gin.H{"message": "pong"})
     })
 
-    port := os.Getenv("APP_PORT")
-    if port == "" {
-        port = ":8080"
-    }
-    r.Run(port)
+    r.Run(":8080")
 }

@@ -1,0 +1,41 @@
+package midlleware
+
+import (
+    "net/http"
+    "strings"
+    "time"
+
+    "github.com/gin-gonic/gin"
+    "github.com/golang-jwt/jwt/v4"
+)
+
+func AuthMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        authHeader := c.GetHeader("Authorization")
+        if authHeader == "" {
+            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
+            return
+        }
+
+        tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+
+        token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+            return jwtSecret, nil
+        })
+        if err != nil || !token.Valid {
+            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+            return
+        }
+
+        // Recupera claims
+        claims, ok := token.Claims.(*CustomClaims)
+        if !ok {
+            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid claims"})
+            return
+        }
+
+        // Salvar user_id nos context
+        c.Set("user_id", claims.UserID)
+        c.Next()
+    }
+}

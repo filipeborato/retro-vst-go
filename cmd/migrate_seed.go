@@ -2,8 +2,7 @@ package main
 
 import (
     "fmt"
-    "log"
-    "os"
+    "log"   
 
     "github.com/joho/godotenv"
     "retro-vst-go/db"

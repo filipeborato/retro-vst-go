@@ -6,11 +6,11 @@ DROP TRIGGER IF EXISTS trg_update_balance_after_payment;
 DROP TRIGGER IF EXISTS trg_update_balance_after_transaction;
 
 -- Dropar tabelas
-DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS sessions;
 
 -- Reativar checks de foreign_key
 PRAGMA foreign_keys = ON;

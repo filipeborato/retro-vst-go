@@ -1,0 +1,4 @@
+{ 
+    "go.inferGopath": false,
+    "go.gopath": "/snap/go/current/bin/go"
+}

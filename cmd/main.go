@@ -22,8 +22,8 @@ func main() {
     r.POST("/login", handlers.LoginHandler(db))
 
     // Google OAuth
-    // - Rota de redirect: GET /auth/google => redireciona para Google
-    // - Rota de callback: GET /auth/google/callback => handlers.GoogleCallbackHandler(db)
+    // - Rota de redirect: GET /auth/google => redireciona para Google   
+    r.GET("/auth/google/callback", handlers.GoogleCallbackHandler(db))
 
     // Exemplo de rota protegida
     // r.GET("/profile", AuthMiddleware(), ProfileHandler)
@@ -31,7 +31,7 @@ func main() {
     protected := r.Group("/api")
     protected.Use(handlers.AuthMiddleware())
     {
-        protected.GET("/profile", handlers.ProfileHandler())        
+        protected.GET("/profile", handlers.ProfileHandler(db))        
     }
 
     r.GET("/ping", func(c *gin.Context) {

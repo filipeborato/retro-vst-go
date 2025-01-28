@@ -5,7 +5,7 @@ import (
 
     "gorm.io/gorm"
 
-    "retro-vst-go/domain" // ajuste o import conforme seu go.mod e pastas
+    "retro-vst-go/domain"
 )
 
 func AutoMigrateDB(db *gorm.DB) error {
@@ -21,13 +21,14 @@ func AutoMigrateDB(db *gorm.DB) error {
     }
     log.Println("Tabelas migradas via AutoMigrate.")
 
-    // 2) Forçar foreign_keys = ON para SQLite
-    //    (No GORM, às vezes é preciso rodar esse pragma via Exec)
+    // 2) Habilitar foreign_keys para SQLite
     if err := db.Exec("PRAGMA foreign_keys = ON;").Error; err != nil {
         return err
     }
 
-    // 3) Criar índices (se quiser replicar o SQL "CREATE INDEX IF NOT EXISTS ...")
+    // 3) Criar índices adicionais (opcional)
+    //    Ajuste para as colunas que de fato existem no seu schema.
+
     // payments
     if err := db.Exec(`
         CREATE INDEX IF NOT EXISTS idx_payments_user_id 
@@ -36,9 +37,10 @@ func AutoMigrateDB(db *gorm.DB) error {
         return err
     }
 
+    // Se quiser indexar transaction_id em payments (já que substituiu product_id), use:
     if err := db.Exec(`
-        CREATE INDEX IF NOT EXISTS idx_payments_product_id 
-        ON payments (product_id);
+        CREATE INDEX IF NOT EXISTS idx_payments_transaction_id
+        ON payments (transaction_id);
     `).Error; err != nil {
         return err
     }
@@ -50,6 +52,7 @@ func AutoMigrateDB(db *gorm.DB) error {
     `).Error; err != nil {
         return err
     }
+
     if err := db.Exec(`
         CREATE INDEX IF NOT EXISTS idx_transactions_product_id 
         ON transactions (product_id);
@@ -57,8 +60,8 @@ func AutoMigrateDB(db *gorm.DB) error {
         return err
     }
 
-    // 4) Criar triggers de atualização de current_balance (caso não existam)
-    // Trigger: AFTER INSERT ON payments
+    // 4) Criar triggers para atualizar current_balance em users
+    // Trigger: AFTER INSERT ON payments (adiciona top_up_value ao saldo)
     if err := db.Exec(`
     CREATE TRIGGER IF NOT EXISTS trg_update_balance_after_payment
     AFTER INSERT ON payments
@@ -71,7 +74,7 @@ func AutoMigrateDB(db *gorm.DB) error {
         return err
     }
 
-    // Trigger: AFTER INSERT ON transactions
+    // Trigger: AFTER INSERT ON transactions (debita transaction_value do saldo)
     if err := db.Exec(`
     CREATE TRIGGER IF NOT EXISTS trg_update_balance_after_transaction
     AFTER INSERT ON transactions

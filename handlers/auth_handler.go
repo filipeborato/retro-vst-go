@@ -4,6 +4,7 @@ package handlers
 
 import (
     "net/http"
+    "fmt"
     "strings"
     "os"
 
@@ -134,6 +135,7 @@ func CreateJWT(user domain.User) (string, error) {
             Issuer:    "retro-vst-go",
         },
     }
+    fmt.Printf("secret = %v\n", jwtSecret)
 
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
     return token.SignedString(jwtSecret)

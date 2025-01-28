@@ -5,11 +5,10 @@ import (
 
     "gorm.io/gorm"
 
-    "retro-vst-go/domain" // Ajuste o import conforme seu go.mod
+    "retro-vst-go/domain"
 )
 
 // InsertMockData insere dados de teste (usuários, produtos, payments, transactions).
-// É opcional e pensado para ambientes de desenvolvimento / testes.
 func InsertMockData(db *gorm.DB) error {
     log.Println("Inserindo dados de teste...")
 
@@ -31,23 +30,19 @@ func InsertMockData(db *gorm.DB) error {
         return err
     }
 
-    // (Opcional) Se quiser capturar os IDs gerados
-    // por ex: users[0].UserID, products[0].ProductID, etc.
-
     // 3) Payments (exemplo de recarga)
-    // Supondo que user 1 recarregue R$50, user 2 recarregue R$100
     payments := []domain.Payment{
         {
-            UserID:            users[0].UserID, // John
-            ProductID:         nil,
+            UserID:           users[0].UserID,
+            TransactionID:     nil,
             ExternalPaymentID: "EXT-ABC-123",
             SupplierName:      "PayPal",
             TopUpValue:        50.00,
             BalanceAfterTopUp: 50.00,
         },
         {
-            UserID:            users[1].UserID, // Jane
-            ProductID:         nil,
+            UserID:           users[1].UserID,
+            TransactionID:     nil,
             ExternalPaymentID: "EXT-XYZ-789",
             SupplierName:      "Stripe",
             TopUpValue:        100.00,
@@ -58,21 +53,21 @@ func InsertMockData(db *gorm.DB) error {
         return err
     }
 
-    // 4) Transactions (débito) - John compra um dos produtos
+    // 4) Transactions (débito)
     transactions := []domain.Transaction{
         {
-            UserID:          users[0].UserID, // John
-            ProductID:       products[0].ProductID, // "TheFunction"
+            UserID:          users[0].UserID,        // John
+            ProductID:       products[0].ProductID,  // "TheFunction"
             TransactionValue: 10.00,
         },
         {
-            UserID:          users[1].UserID, // Jane
-            ProductID:       products[1].ProductID, // "TheWave"
+            UserID:          users[1].UserID,        // Jane
+            ProductID:       products[1].ProductID,  // "TheWave"
             TransactionValue: 20.00,
         },
         {
-            UserID:          users[0].UserID, // John again
-            ProductID:       products[1].ProductID, // "TheWave"
+            UserID:          users[0].UserID,        // John again
+            ProductID:       products[1].ProductID,
             TransactionValue: 20.00,
         },
     }

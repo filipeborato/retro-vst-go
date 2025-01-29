@@ -4,8 +4,8 @@ on:
   push:
     branches: [ "production" ]
   # Se quiser também rodar no "pull_request", pode adicionar
-  # pull_request:
-  #   branches: [ "production" ]
+  pull_request:
+    branches: [ "production" ]
 
 jobs:
   deploy:
@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup SSH
-        uses: webfactory/filipeborato@hotmail.com # ou outra action que você preferir
+        uses: webfactory/[email protected]
         with:
           ssh-private-key: ${{ secrets.DROPLET_KEY }}
 

@@ -4,6 +4,7 @@ import (
     "log" 
     
     "github.com/gin-gonic/gin"
+    "github.com/gin-contrib/cors"
     "retro-vst-go/handlers"
     "retro-vst-go/db"        
 )
@@ -16,6 +17,7 @@ func main() {
     }
 
     r := gin.Default()
+    r.Use(cors.Default())
 
     // Rotas signup e login
     r.POST("/signup", handlers.SignupHandler(db))
@@ -37,7 +39,7 @@ func main() {
     r.GET("/ping", func(c *gin.Context) {
         c.JSON(200, gin.H{"message": "pong"})
     })
-
+        
     r.Run(":8080")
 }
 

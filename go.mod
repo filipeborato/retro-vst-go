@@ -1,6 +1,6 @@
 module retro-vst-go
 
-go 1.23.5
+go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.10.0

@@ -1,0 +1,24 @@
+services:
+  retrovst:
+    build: .
+    container_name: retrovst-api
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./db:/app/db  # Persistência do banco SQLite
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    restart: unless-stopped
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf  # Configuração do Nginx
+      - ./ssl:/etc/nginx/ssl  # SSL (caso precise usar HTTPS)
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - retrovst  # ✅ Agora, apenas o Nginx depende do backend
+

@@ -1,7 +1,6 @@
 package main
 
-import (
-    "fmt"
+import (    
     "log"   
 
     "github.com/joho/godotenv"
@@ -9,11 +8,6 @@ import (
 )
 
 func main() {
-    // Carrega .env (opcional)
-    if err := godotenv.Load(); err != nil {
-        log.Printf("Não foi possível carregar .env: %v", err)
-    }
-
     // Conecta ao banco
     database, err := db.SetupDatabase()
     if err != nil {
@@ -27,15 +21,15 @@ func main() {
     log.Println("Migração concluída com sucesso!")
 
     // 2) Pergunta se deseja inserir mock data
-    fmt.Println("Deseja inserir mock data? (s/n)")
-    var resposta string
-    fmt.Scanln(&resposta)
-    if resposta == "s" {
-        if err := db.InsertMockData(database); err != nil {
-            log.Fatalf("Erro ao inserir dados de teste: %v\n", err)
-        }
-        log.Println("Mock data inserido com sucesso!")
-    } else {
-        fmt.Println("Dados mock NÃO inseridos.")
-    }
+    // fmt.Println("Deseja inserir mock data? (s/n)")
+    // var resposta string
+    // fmt.Scanln(&resposta)
+    // if resposta == "s" {
+    //     if err := db.InsertMockData(database); err != nil {
+    //         log.Fatalf("Erro ao inserir dados de teste: %v\n", err)
+    //     }
+    //     log.Println("Mock data inserido com sucesso!")
+    // } else {
+    //     fmt.Println("Dados mock NÃO inseridos.")
+    // }
 }

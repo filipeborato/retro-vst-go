@@ -1,23 +1,32 @@
 package main
 
 import (    
-    "log" 
+    "log"
+    "time"
     
-    "github.com/gin-gonic/gin"
     "github.com/gin-contrib/cors"
+    "github.com/gin-gonic/gin"    
     "retro-vst-go/handlers"
-    "retro-vst-go/db"        
+    "retro-vst-go/db"         
 )
 
-func main() {
-    // Conexão simples com SQLite (pode usar db.SetupDatabase() se tiver pronto)
+func main() {    
     db, err := db.SetupDatabase()
     if err != nil {        
         log.Fatal(err)
     }
+     // Configuração personalizada do CORS
+     config := cors.Config{        
+        AllowOrigins:     []string{"*"},        
+        AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},        
+        AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},        
+        ExposeHeaders:    []string{"Content-Length"},      
+        AllowCredentials: true,        
+        MaxAge:           12 * time.Hour,
+    }
 
     r := gin.Default()
-    r.Use(cors.Default())
+    r.Use(cors.New(config))
 
     // Rotas signup e login
     r.POST("/signup", handlers.SignupHandler(db))
@@ -26,9 +35,6 @@ func main() {
     // Google OAuth
     // - Rota de redirect: GET /auth/google => redireciona para Google   
     r.GET("/auth/google/callback", handlers.GoogleCallbackHandler(db))
-
-    // Exemplo de rota protegida
-    // r.GET("/profile", AuthMiddleware(), ProfileHandler)
 
     protected := r.Group("/api")
     protected.Use(handlers.AuthMiddleware())

@@ -3,10 +3,8 @@
 package handlers
 
 import (
-    "net/http"
-    "fmt"
-    "strings"
-    "os"
+    "net/http"    
+    "strings"   
 
     "github.com/gin-gonic/gin"
     "golang.org/x/crypto/bcrypt"
@@ -14,6 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 
+    "retro-vst-go/config"
     "retro-vst-go/domain"
 )
 
@@ -120,7 +119,6 @@ func LoginHandler(db *gorm.DB) gin.HandlerFunc {
         })
     }
 }
-var jwtSecret = []byte(os.Getenv("JWT_KEY")) // Ideal ler de variável de ambiente
 
 type CustomClaims struct {
     UserID uint `json:"user_id"`
@@ -128,21 +126,22 @@ type CustomClaims struct {
 }
 
 func CreateJWT(user domain.User) (string, error) {
+    config.LoadEnv()    
     claims := CustomClaims{
         UserID: user.UserID,
         RegisteredClaims: jwt.RegisteredClaims{
             ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
             Issuer:    "retro-vst-go",
         },
-    }
-    fmt.Printf("secret = %v\n", jwtSecret)
+    }  
 
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    return token.SignedString(jwtSecret)
+    return token.SignedString([]byte(config.JWTSecret))
 }
 
 func AuthMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
+        config.LoadEnv()
         authHeader := c.GetHeader("Authorization")
         if authHeader == "" {
             c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
@@ -152,7 +151,7 @@ func AuthMiddleware() gin.HandlerFunc {
         tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 
         token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-            return jwtSecret, nil
+            return []byte(config.JWTSecret), nil
         })
         if err != nil || !token.Valid {
             c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})

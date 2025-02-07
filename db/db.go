@@ -8,10 +8,12 @@ import (
 
     "gorm.io/driver/sqlite"
     "gorm.io/gorm"
+    "retro-vst-go/config"
 )
 
 func SetupDatabase() (*gorm.DB, error) {
-    dbPath := os.Getenv("SQLITE_DB_PATH")
+    config.LoadEnv()    
+    dbPath := config.SQLiteDBPath
     if dbPath == "" {
         dbPath = "db/retrovst.db"
     }

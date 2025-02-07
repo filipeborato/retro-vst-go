@@ -3,6 +3,7 @@ package main
 import (    
     "log" 
     
+    "github.com/gin-contrib/cors"
     "github.com/gin-gonic/gin"
     "retro-vst-go/handlers"
     "retro-vst-go/db"        
@@ -16,6 +17,7 @@ func main() {
     }
 
     r := gin.Default()
+    r.Use(cors.Default())
 
     // Rotas signup e login
     r.POST("/signup", handlers.SignupHandler(db))

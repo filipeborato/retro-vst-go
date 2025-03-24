@@ -8,11 +8,6 @@ import (
 )
 
 func main() {
-    // Carrega .env (opcional)
-    if err := godotenv.Load(); err != nil {
-        log.Printf("Não foi possível carregar .env: %v", err)
-    }
-
     // Conecta ao banco
     database, err := db.SetupDatabase()
     if err != nil {

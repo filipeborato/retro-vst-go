@@ -99,7 +99,7 @@ APP_ENV=production
 
 2. Build and start containers:
 ```bash
-docker-compose up --build -d
+docker-compose up --build
 ```
 - This will create:
 - **retrovst** container: Go app + SQLite
@@ -156,7 +156,7 @@ Authorization: Bearer <token>
 
 ---
 ## Contribute
-- Fork the repository.
+- Fork the repository. 
 - Create your feature branch: `git checkout -b feature/my-feature`
 - Commit your changes: `git commit -m 'My new feature'`
 - Push the branch: `git push origin feature/my-feature`

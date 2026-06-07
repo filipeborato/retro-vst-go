@@ -12,16 +12,19 @@ import (
     "gorm.io/gorm"
 )
 
-var googleOAuthConfig = &oauth2.Config{
-    ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-    ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-    RedirectURL:  os.Getenv("URL_CALLBACK"),
-    Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
-    Endpoint:     google.Endpoint,
+func getGoogleOAuthConfig() *oauth2.Config {
+    return &oauth2.Config{
+        ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+        ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+        RedirectURL:  os.Getenv("URL_CALLBACK"),
+        Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
+        Endpoint:     google.Endpoint,
+    }
 }
 
 func GoogleCallbackHandler(db *gorm.DB) gin.HandlerFunc {
     return func(c *gin.Context) {
+        config := getGoogleOAuthConfig()
         code := c.Query("code")
         if code == "" {
             c.JSON(http.StatusBadRequest, gin.H{"error": "Missing code"})
@@ -29,14 +32,14 @@ func GoogleCallbackHandler(db *gorm.DB) gin.HandlerFunc {
         }
 
         // Troca o code por token
-        token, err := googleOAuthConfig.Exchange(context.Background(), code)
+        token, err := config.Exchange(context.Background(), code)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to exchange token"})
             return
         }
 
         // Usa esse token para buscar info do usuário no endpoint do Google
-        client := googleOAuthConfig.Client(context.Background(), token)
+        client := config.Client(context.Background(), token)
         resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get user info"})

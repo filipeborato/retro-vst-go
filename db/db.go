@@ -19,11 +19,16 @@ func SetupDatabase() (*gorm.DB, error) {
     }
 
     // Monta path absoluto (opcional, mas ajuda a evitar problemas)
-    root, err := os.Getwd()
-    if err != nil {
-        return nil, fmt.Errorf("erro ao obter diretório atual: %w", err)
+    var dbAbsolutePath string
+    if filepath.IsAbs(dbPath) {
+        dbAbsolutePath = dbPath
+    } else {
+        root, err := os.Getwd()
+        if err != nil {
+            return nil, fmt.Errorf("erro ao obter diretório atual: %w", err)
+        }
+        dbAbsolutePath = filepath.Join(root, dbPath)
     }
-    dbAbsolutePath := filepath.Join(root, dbPath)
 
     // Abre conexão via GORM
     db, err := gorm.Open(sqlite.Open(dbAbsolutePath), &gorm.Config{})

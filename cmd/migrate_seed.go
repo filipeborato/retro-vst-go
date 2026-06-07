@@ -3,7 +3,6 @@ package main
 import (    
     "log"   
 
-    "github.com/joho/godotenv"
     "retro-vst-go/db"
 )
 

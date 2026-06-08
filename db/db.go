@@ -1,14 +1,15 @@
 package db
 
 import (
-    "fmt"
-    "log"
-    "os"
-    "path/filepath"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 
-    "gorm.io/driver/sqlite"
-    "gorm.io/gorm"
-    "retro-vst-go/config"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"retro-vst-go/config"
 )
 
 func SetupDatabase() (*gorm.DB, error) {
@@ -30,8 +31,10 @@ func SetupDatabase() (*gorm.DB, error) {
         dbAbsolutePath = filepath.Join(root, dbPath)
     }
 
-    // Abre conexão via GORM
-    db, err := gorm.Open(sqlite.Open(dbAbsolutePath), &gorm.Config{})
+	// Abre conexão via GORM
+	db, err := gorm.Open(sqlite.Open(dbAbsolutePath), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Warn),
+	})
     if err != nil {
         return nil, fmt.Errorf("erro ao abrir conexão com SQLite/GORM: %w", err)
     }

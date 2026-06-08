@@ -143,6 +143,28 @@ Authorization: Bearer <token>
 - Routes like `GET /api/profile` require this token.
 
 ---
+## Credit System (Audio Processing Cost)
+The API manages audio VST processing costs using a virtual credit system:
+- **1 Credit is equivalent to 1 US Cent (USD $0.01)**.
+- **USD $1.00 = 100 Credits**.
+- **BRL R$ 5.00 = 100 Credits** (which translates to **1 Credit = R$ 0.05**).
+
+### Minimum Deposit Limits (Top-up)
+- **Minimum Top-up (BRL)**: R$ 5,00 (corresponds to 100 credits).
+- **Minimum Top-up (USD)**: $ 1.00 (corresponds to 100 credits).
+
+### VST Processing Cost per Plugin
+When requesting audio processing (`POST /api/process?plugin=...`), the user's wallet balance is debited according to the plugin's credit cost:
+- `TheFunction`: 10 credits (R$ 0,50 / $ 0.10)
+- `PitchedDelay`: 8 credits (R$ 0,40 / $ 0.08)
+- `para-equalizer-x8-stereo`: 6 credits (R$ 0,30 / $ 0.06)
+- `para-equalizer-x8-mono`: 5 credits (R$ 0,25 / $ 0.05)
+- `compressor-stereo`: 4 credits (R$ 0,20 / $ 0.04)
+- `filter-stereo`: 2 credits (R$ 0,10 / $ 0.02)
+- `filter-mono`: 1 credit (R$ 0,05 / $ 0.01)
+- Other/Default: 3 credits (R$ 0,15 / $ 0.03)
+
+---
 ## Google OAuth
 - To enable Google OAuth, set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, etc. in `.env`.
 - Callback route: `/auth/google/callback`.

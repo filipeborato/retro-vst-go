@@ -20,6 +20,7 @@ import (
 	"retro-vst-go/db"
 	"retro-vst-go/domain"
 	"retro-vst-go/handlers"
+	"retro-vst-go/repository"
 	gormrepo "retro-vst-go/repository/gorm"
 )
 
@@ -293,12 +294,14 @@ func TestStripeCheckoutLimitsAndProcessProxy(t *testing.T) {
 	defer vstServer.Close()
 	t.Setenv("VST_HOST_URL", vstServer.URL)
 
+	pricingRepo := repository.NewJSONPricingRepository("pricing_rules.json")
+
 	r := gin.Default()
 	protected := r.Group("/api")
 	protected.Use(handlers.AuthMiddleware())
 	{
 		protected.POST("/payments/stripe/checkout", handlers.CreateStripeCheckoutHandler(paymentRepo))
-		protected.POST("/process", handlers.CreateProcessProxyHandler(userRepo, dbConn))
+		protected.POST("/process", handlers.CreateProcessProxyHandler(userRepo, pricingRepo, dbConn))
 	}
 
 	// 1. Testa limite mínimo em BRL (deve falhar para R$ 4.99)

@@ -48,3 +48,8 @@ type SessionRepository interface {
 	GetByUserID(userID uint) ([]domain.Session, error)
 	DeleteByUserID(userID uint) error
 }
+
+type PricingRepository interface {
+	GetPluginCredits(pluginName string) int
+	GetCreditCost(credits int, currency string) float64
+}

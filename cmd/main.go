@@ -9,6 +9,7 @@ import (
 	"retro-vst-go/config"
 	"retro-vst-go/db"
 	"retro-vst-go/handlers"
+	"retro-vst-go/repository"
 	gormrepo "retro-vst-go/repository/gorm"
 )
 
@@ -31,6 +32,7 @@ func main() {
 	paymentRepo := gormrepo.NewPaymentRepository(dbConn)
 	transactionRepo := gormrepo.NewTransactionRepository(dbConn)
 	sessionRepo := gormrepo.NewSessionRepository(dbConn)
+	pricingRepo := repository.NewJSONPricingRepository("pricing_rules.json")
 
 	// Configuração do CORS que suporta credenciais (cookies/headers de auth) de forma válida
 	corsConfig := cors.Config{
@@ -73,7 +75,7 @@ func main() {
 		// Perfil & Logout
 		protected.GET("/profile", handlers.ProfileHandler(userRepo))
 		protected.POST("/logout", handlers.LogoutHandler(sessionRepo))
-		protected.POST("/process", handlers.CreateProcessProxyHandler(userRepo, dbConn))
+		protected.POST("/process", handlers.CreateProcessProxyHandler(userRepo, pricingRepo, dbConn))
 
 		// Administração de produtos
 		protected.POST("/products", handlers.CreateProductHandler(productRepo))

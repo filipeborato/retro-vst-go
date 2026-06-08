@@ -12,37 +12,7 @@ import (
 	"retro-vst-go/repository"
 )
 
-// Mapeamento de créditos consumidos por plugin
-func getPluginCredits(pluginName string) int {
-	switch pluginName {
-	case "TheFunction":
-		return 10
-	case "PitchedDelay":
-		return 8
-	case "para-equalizer-x8-stereo":
-		return 6
-	case "para-equalizer-x8-mono":
-		return 5
-	case "compressor-stereo":
-		return 4
-	case "filter-stereo":
-		return 2
-	case "filter-mono":
-		return 1
-	default:
-		return 3 // Custo padrão para outros plugins
-	}
-}
-
-// Conversão de créditos para moeda real
-func getCreditCost(credits int, currency string) float64 {
-	if currency == "USD" {
-		return float64(credits) * 0.01 // 1 crédito = USD $0.01
-	}
-	return float64(credits) * 0.05 // 1 crédito = BRL R$ 0.05 (Default)
-}
-
-func CreateProcessProxyHandler(userRepo repository.UserRepository, dbConn *gorm.DB) gin.HandlerFunc {
+func CreateProcessProxyHandler(userRepo repository.UserRepository, pricingRepo repository.PricingRepository, dbConn *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uid, exists := c.Get("user_id")
 		if !exists {
@@ -62,7 +32,7 @@ func CreateProcessProxyHandler(userRepo repository.UserRepository, dbConn *gorm.
 			return
 		}
 
-		creditsRequired := getPluginCredits(pluginName)
+		creditsRequired := pricingRepo.GetPluginCredits(pluginName)
 
 		// 2. Verifica saldo do usuário
 		var cost float64
@@ -78,7 +48,7 @@ func CreateProcessProxyHandler(userRepo repository.UserRepository, dbConn *gorm.
 			user = &u
 
 			// Calcula o custo com base na moeda da conta do usuário
-			cost = getCreditCost(creditsRequired, u.Currency)
+			cost = pricingRepo.GetCreditCost(creditsRequired, u.Currency)
 
 			// Verifica se tem saldo suficiente
 			if u.CurrentBalance < cost {

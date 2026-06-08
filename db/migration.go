@@ -16,6 +16,8 @@ func AutoMigrateDB(db *gorm.DB) error {
         &domain.Payment{},
         &domain.Transaction{},
         &domain.Session{},
+        &domain.PluginCredit{},
+        &domain.CreditRate{},
     ); err != nil {
         return err
     }

@@ -10,8 +10,8 @@ type Transaction struct {
     TransactionDate  time.Time `gorm:"column:transaction_date;not null;default:CURRENT_TIMESTAMP"`
 
     // Se quiser mapear o relacionamento com User e Product via GORM:
-    User    *User    `gorm:"foreignKey:UserID;references:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-    Product *Product `gorm:"foreignKey:ProductID;references:ProductID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+    User    *User    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+    Product *Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 func (Transaction) TableName() string {

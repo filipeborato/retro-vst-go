@@ -16,6 +16,8 @@ func AutoMigrateDB(db *gorm.DB) error {
         &domain.Payment{},
         &domain.Transaction{},
         &domain.Session{},
+        &domain.PluginCredit{},
+        &domain.CreditRate{},
     ); err != nil {
         return err
     }
@@ -60,33 +62,15 @@ func AutoMigrateDB(db *gorm.DB) error {
         return err
     }
 
-    // 4) Criar triggers para atualizar current_balance em users
-    // Trigger: AFTER INSERT ON payments (adiciona top_up_value ao saldo)
-    if err := db.Exec(`
-    CREATE TRIGGER IF NOT EXISTS trg_update_balance_after_payment
-    AFTER INSERT ON payments
-    BEGIN
-        UPDATE users
-        SET current_balance = current_balance + NEW.top_up_value
-        WHERE user_id = NEW.user_id;
-    END;
-    `).Error; err != nil {
+    // 4) Remover triggers antigos, pois a atualização de saldo agora é feita na camada da aplicação
+    if err := db.Exec("DROP TRIGGER IF EXISTS trg_update_balance_after_payment;").Error; err != nil {
         return err
     }
 
-    // Trigger: AFTER INSERT ON transactions (debita transaction_value do saldo)
-    if err := db.Exec(`
-    CREATE TRIGGER IF NOT EXISTS trg_update_balance_after_transaction
-    AFTER INSERT ON transactions
-    BEGIN
-        UPDATE users
-        SET current_balance = current_balance - NEW.transaction_value
-        WHERE user_id = NEW.user_id;
-    END;
-    `).Error; err != nil {
+    if err := db.Exec("DROP TRIGGER IF EXISTS trg_update_balance_after_transaction;").Error; err != nil {
         return err
     }
 
-    log.Println("Índices e triggers criados/verificados com sucesso.")
+    log.Println("Índices verificados e triggers antigos removidos.")
     return nil
 }

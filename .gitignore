@@ -2,3 +2,7 @@
 vendor/
 db/retrovst.db
 .github/
+*.exe
+.agents/
+.agent/
+skills-lock.json

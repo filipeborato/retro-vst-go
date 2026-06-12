@@ -14,8 +14,8 @@ func InsertMockData(db *gorm.DB) error {
 
     // 1) Users
     users := []domain.User{
-        {FullName: "John Doe", Email: "john.doe@example.com", PasswordHash: "hashsenha123"},
-        {FullName: "Jane Smith", Email: "jane.smith@example.com", PasswordHash: "hashsenha456"},
+        {FullName: "John Doe", Email: "john.doe@example.com", PasswordHash: "hashsenha123", CurrentBalance: 20.00},
+        {FullName: "Jane Smith", Email: "jane.smith@example.com", PasswordHash: "hashsenha456", CurrentBalance: 80.00},
     }
     if err := db.Create(&users).Error; err != nil {
         return err

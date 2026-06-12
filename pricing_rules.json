@@ -1,0 +1,15 @@
+{
+  "plugin_credits": {
+    "TheFunction": 10,
+    "PitchedDelay": 8,
+    "para-equalizer-x8-stereo": 6,
+    "para-equalizer-x8-mono": 5,
+    "compressor-stereo": 4,
+    "filter-stereo": 2,
+    "filter-mono": 1
+  },
+  "credit_conversion_rates": {
+    "USD": 0.01,
+    "BRL": 0.05
+  }
+}

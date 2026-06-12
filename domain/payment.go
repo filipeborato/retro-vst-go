@@ -10,11 +10,13 @@ type Payment struct {
     TransactionID     *uint        `gorm:"column:transaction_id"` // pode ser nulo
     
     // Relacionamentos
-    User         *User         `gorm:"foreignKey:UserID;references:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-    Transaction  *Transaction  `gorm:"foreignKey:TransactionID;references:TransactionID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+    User         *User         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+    Transaction  *Transaction  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
     
     ExternalPaymentID string    `gorm:"column:external_payment_id;type:TEXT;not null"`
     SupplierName      string    `gorm:"column:supplier_name;type:TEXT;not null"`
+    Status            string    `gorm:"column:status;type:TEXT;not null;default:'pending'"` // "pending", "approved", "failed"
+    Currency          string    `gorm:"column:currency;type:TEXT;not null;default:'BRL'"`   // "BRL" ou "USD"
     TopUpValue        float64   `gorm:"column:top_up_value;type:DECIMAL(10,2);not null;default:0"`
     BalanceAfterTopUp float64   `gorm:"column:balance_after_top_up;type:DECIMAL(10,2);not null;default:0"`
     PaymentDate       time.Time `gorm:"column:payment_date;not null;default:CURRENT_TIMESTAMP"`
